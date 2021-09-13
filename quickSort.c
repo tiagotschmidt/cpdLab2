@@ -1,6 +1,7 @@
 // Trabalho Laboratório 2 - Classificação e Pesquisa de Dados - Gabriel Castelo Branco Gomes e Tiago Torres Schmidt.
 #include <stdio.h>//Bibliotecas utilizadas no projeto.
 #include <time.h>
+#include <stdlib.h>
 #include <locale.h>
 
 #define MAX_ITEMS 1000000//Constantes utilizadas no projeto.
@@ -9,7 +10,7 @@
 #define DEFAULT_OUTPUT1 "stats-mediana-hoare.txt"
 #define DEFAULT_OUTPUT2 "stats-mediana-lomuto.txt"
 #define DEFAULT_OUTPUT3 "stats-aleatorio-hoare.txt"
-#define DEFAULT_OUTPUT4 "stats-aleatorio-lomuto.tx"
+#define DEFAULT_OUTPUT4 "stats-aleatorio-lomuto.txt"
 
 void prtArray(int array[], int vectorLength, FILE* output){//Função prtArray. Printa a Array informada dentro do arquivo apontado por *output.
   int i;
@@ -94,6 +95,47 @@ void quickSortLomutoMedian(int array[], int firstIndex, int lastIndex){
   }
 }
 
+int qSLMPartitionRandom(int array[], int firstIndex, int lastIndex){
+  int randIndex,pivot;
+  int i,j;
+
+  srand(time(NULL));
+
+  randIndex = firstIndex + rand() % (lastIndex+1 - firstIndex);
+
+  swap(&array[randIndex],&array[lastIndex]);
+
+  pivot = array[lastIndex];
+  i = firstIndex - 1;
+
+  /*printf("Pivot:%d\n",pivot);
+  prtArrayCLI(array,16);
+  printf("\n");*/
+
+  for(j=firstIndex; j < lastIndex;j++){
+    if(array[j] <= pivot){
+      i++;
+      swap(&array[i],&array[j]);
+    }
+  }
+  swap(&array[i+1],&array[lastIndex]);
+
+  //prtArrayCLI(array,16);
+
+  //puts("\n");
+
+  return (i+1);
+}
+
+void quickSortLomutoRandom(int array[], int firstIndex, int lastIndex){
+  int q;
+  if(firstIndex < lastIndex){
+    q = qSLMPartitionRandom(array, firstIndex, lastIndex);
+    quickSortLomutoRandom(array,firstIndex,q-1);
+    quickSortLomutoRandom(array,q+1,lastIndex);
+  }
+}
+
 int main(){//Função main. Executa os testes requisitados.
   setlocale(LC_ALL,"");
   int buffer[MAX_ITEMS];//Variáveis utilizadas nos testes.
@@ -117,30 +159,32 @@ int main(){//Função main. Executa os testes requisitados.
       fscanf(input,"%d ",&buffer[i]);//Executa a leitura do .txt de entrada.
     }
 
-    prtArrayCLI(buffer,nItems);
-    quickSortLomutoMedian(buffer,0,nItems-1);
-    puts("\nOrganizado:");
-    prtArrayCLI(buffer,nItems);
-
-    /*for(j=0;j<4;j++){//Para cada array lido do .txt, executa três variações do shell....
+    for(j=0;j<4;j++){//Para cada array lido do .txt, executa três variações do shell....
       for(k=0; k < MAX_ITEMS; k++) {//Copia o buffer para bufferClone.
         bufferClone[k] = buffer[k];
       }
+      puts("Desorganizado:");
+      prtArrayCLI(bufferClone,nItems);
+      printf("\n");
       switch(j){//Varia entres os tipos de shell.
         case 0:
-          shellSortBASE2T(bufferClone, nItems, output);
+          quickSortLomutoMedian(bufferClone,0,nItems-1);
+          puts("Organizado:");
+          prtArrayCLI(bufferClone,nItems);
           break;
         case 1:
-          shellSortKNUTHT(bufferClone, nItems, output);
+          quickSortLomutoRandom(bufferClone,0,nItems-1);
+          puts("Organizado:");
+          prtArrayCLI(bufferClone,nItems);
           break;
         case 2:
-          shellSortCIURAT(bufferClone, nItems, output);
           break;
         case 3:
-          shellSortCIURAT(bufferClone, nItems, output);
           break;
-      }*/
+      }
+      printf("\n");
     }
+  }
 
 
   /*fclose(output);//Fecha os ponteiros de leitura.
