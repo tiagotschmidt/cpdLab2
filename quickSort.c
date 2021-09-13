@@ -24,18 +24,16 @@ void prtArrayCLI(int array[], int vectorLength){//Função prtArrayCLI. Printa a
   }
 }
 
-File initializeFileR(File* input, char* name){
-  if((input = fopen(DEFAULT_INPUT1,"r")) == NULL){//Tenta abrir o arquivo de entrada,
+FILE* initializeFileR(FILE* input, char* name){
+  if((input = fopen(name,"r")) == NULL){//Tenta abrir o arquivo de entrada,
     printf("Erro ao abrir arquivo %s \n",name);//Caso de falha.
-    break;
   }
   return input;
 }
 
-File initializeFileW(File* input, char* name){
-  if((input = fopen(DEFAULT_INPUT1,"w")) == NULL){//Tenta abrir o arquivo de entrada,
+FILE* initializeFileW(FILE* input, char* name){
+  if((input = fopen(name,"w")) == NULL){//Tenta abrir o arquivo de entrada,
     printf("Erro ao abrir arquivo %s \n",name);//Caso de falha.
-    break;
   }
   return input;
 }
@@ -44,8 +42,38 @@ void swap(int* a,int *b){
   int buffer;
 
   buffer = *a;
-  *a = *b
+  *a = *b;
   *b = buffer;
+}
+
+int qSLMPartition(int array[], int firstIndex, int lastIndex){
+  int mid, pivot;
+  int x,i,j;
+
+  mid = (array[firstIndex] + array[lastIndex])/2;
+
+  if(array[mid] < array[firstIndex]){
+    swap(&array[mid],&array[firstIndex]);
+  }
+  if(array[lastIndex] < array[firstIndex]){
+    swap(&array[lastIndex],&array[firstIndex]);
+  }
+  if(array[lastIndex] < array[mid]){
+    swap(&array[mid],&array[lastIndex]);
+  }
+
+  x = array[mid];
+  i = firstIndex - 1;
+
+  for(j=firstIndex; j < mid-1;j++){
+    if(array[j] <= x){
+      i = i+1;
+      swap(&array[i],&array[j]);
+    }
+  }
+  swap(&array[i+1],&array[lastIndex]);
+
+  return i+1;
 }
 
 void quickSortLomutoMedian(int array[], int firstIndex, int lastIndex){
@@ -57,51 +85,21 @@ void quickSortLomutoMedian(int array[], int firstIndex, int lastIndex){
   }
 }
 
-int qSLMPartition(int array[], int firstIndex, int lastIndex){
-  int mid, pivot;
-  int x,i,j;
-
-  mid = (array[firstIndex] + array[lastIndex])/2;
-
-  if(array[mid] < array[firstIndex]){
-    swap(array[mid],array[firstIndex]);
-  }
-  if(array[lastIndex] < array[firstIndex]){
-    swap(array[lastIndex],array[firstIndex]);
-  }
-  if(array[lastIndex] < array[mid]){
-    swap(array[mid],array[lastIndex]);
-  }
-
-  x = array[mid];
-  i = firstIndex - 1;
-
-  for(j=firstIndex; j < mid-1;j++){
-    if(a[j] <= x){
-      i = i+1;
-      swap(a[i],a[j])
-    }
-  }
-  swap(a[i+1],a[lastIndex]);
-
-  return i+1;
-}
-
 int main(){//Função main. Executa os testes requisitados.
   int buffer[MAX_ITEMS];//Variáveis utilizadas nos testes.
   int bufferClone[MAX_ITEMS];//Buffer e BufferClone são os espaços de leitura dos vetores do .txt
   int nItems;//Quantifica quantos itens existem no array.
   int i,j,k;//Índices de uso geral.
   FILE* input;//Ponteiros para os arquivos.
-  FILE* output1,output2,output3,output4;
+  FILE* output1,*output2,*output3,*output4;
   char seqName[3][MAX_CHAR] = {"SHELL\n","KNUTH\n","CIURA\n"};
   char cName[MAX_CHAR];//Sistema para impressão da sequência atual.
 
   input = initializeFileR(input,DEFAULT_INPUT);
-  output1 = initializeFileR(input,DEFAULT_OUTPUT1);
-  output2 = initializeFileR(input,DEFAULT_OUTPUT2);
-  output3 = initializeFileR(input,DEFAULT_OUTPUT3);
-  output4 = initializeFileR(input,DEFAULT_OUTPUT4);
+  output1 = initializeFileR(output1,DEFAULT_OUTPUT1);
+  output2 = initializeFileR(output2,DEFAULT_OUTPUT2);
+  output3 = initializeFileR(output3,DEFAULT_OUTPUT3);
+  output4 = initializeFileR(output4,DEFAULT_OUTPUT4);
 
   while(feof(input)==0){//Enquanto não encontra o fim do arquivo de entrada.
     fscanf(input,"%d ",&nItems);//Resgata o número de itens no array.
@@ -112,7 +110,7 @@ int main(){//Função main. Executa os testes requisitados.
       for(k=0; k < MAX_ITEMS; k++) {//Copia o buffer para bufferClone.
         bufferClone[k] = buffer[k];
       }
-      switch(j){//Varia entres os tipos de shell.
+      /*switch(j){//Varia entres os tipos de shell.
         case 0:
           shellSortBASE2T(bufferClone, nItems, output);
           break;
@@ -125,12 +123,12 @@ int main(){//Função main. Executa os testes requisitados.
         case 3:
           shellSortCIURAT(bufferClone, nItems, output);
           break;
-      }
+      }*/
     }
   }
 
-  fclose(output);//Fecha os ponteiros de leitura.
-  fclose(input);
+  /*fclose(output);//Fecha os ponteiros de leitura.
+  fclose(input);*/
   return 0;
 }
 
