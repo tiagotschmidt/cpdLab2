@@ -1,6 +1,7 @@
 // Trabalho Laboratório 2 - Classificação e Pesquisa de Dados - Gabriel Castelo Branco Gomes e Tiago Torres Schmidt.
 #include <stdio.h>//Bibliotecas utilizadas no projeto.
 #include <time.h>
+#include <locale.h>
 
 #define MAX_ITEMS 1000000//Constantes utilizadas no projeto.
 #define MAX_CHAR 10
@@ -8,7 +9,7 @@
 #define DEFAULT_OUTPUT1 "stats-mediana-hoare.txt"
 #define DEFAULT_OUTPUT2 "stats-mediana-lomuto.txt"
 #define DEFAULT_OUTPUT3 "stats-aleatorio-hoare.txt"
-#define DEFAULT_OUTPUT4 "stats-aleat ́orio-lomuto.tx"
+#define DEFAULT_OUTPUT4 "stats-aleatorio-lomuto.tx"
 
 void prtArray(int array[], int vectorLength, FILE* output){//Função prtArray. Printa a Array informada dentro do arquivo apontado por *output.
   int i;
@@ -48,9 +49,9 @@ void swap(int* a,int *b){
 
 int qSLMPartition(int array[], int firstIndex, int lastIndex){
   int mid, pivot;
-  int x,i,j;
+  int i,j;
 
-  mid = (array[firstIndex] + array[lastIndex])/2;
+  mid = (firstIndex + lastIndex)/2;
 
   if(array[mid] < array[firstIndex]){
     swap(&array[mid],&array[firstIndex]);
@@ -58,22 +59,30 @@ int qSLMPartition(int array[], int firstIndex, int lastIndex){
   if(array[lastIndex] < array[firstIndex]){
     swap(&array[lastIndex],&array[firstIndex]);
   }
-  if(array[lastIndex] < array[mid]){
+  if(array[mid] < array[lastIndex]){
     swap(&array[mid],&array[lastIndex]);
   }
 
-  x = array[mid];
+  pivot = array[lastIndex];
   i = firstIndex - 1;
 
-  for(j=firstIndex; j < mid-1;j++){
-    if(array[j] <= x){
-      i = i+1;
+  /*printf("\nPivot:%d\n",pivot);
+  prtArrayCLI(array,16);
+  printf("\n");*/
+
+  for(j=firstIndex; j < lastIndex;j++){
+    if(array[j] <= pivot){
+      i++;
       swap(&array[i],&array[j]);
     }
   }
   swap(&array[i+1],&array[lastIndex]);
 
-  return i+1;
+  //prtArrayCLI(array,16);
+
+  //puts("\n");
+
+  return (i+1);
 }
 
 void quickSortLomutoMedian(int array[], int firstIndex, int lastIndex){
@@ -86,6 +95,7 @@ void quickSortLomutoMedian(int array[], int firstIndex, int lastIndex){
 }
 
 int main(){//Função main. Executa os testes requisitados.
+  setlocale(LC_ALL,"");
   int buffer[MAX_ITEMS];//Variáveis utilizadas nos testes.
   int bufferClone[MAX_ITEMS];//Buffer e BufferClone são os espaços de leitura dos vetores do .txt
   int nItems;//Quantifica quantos itens existem no array.
@@ -96,21 +106,27 @@ int main(){//Função main. Executa os testes requisitados.
   char cName[MAX_CHAR];//Sistema para impressão da sequência atual.
 
   input = initializeFileR(input,DEFAULT_INPUT);
-  output1 = initializeFileR(output1,DEFAULT_OUTPUT1);
-  output2 = initializeFileR(output2,DEFAULT_OUTPUT2);
-  output3 = initializeFileR(output3,DEFAULT_OUTPUT3);
-  output4 = initializeFileR(output4,DEFAULT_OUTPUT4);
+  output1 = initializeFileW(output1,DEFAULT_OUTPUT1);
+  output2 = initializeFileW(output2,DEFAULT_OUTPUT2);
+  output3 = initializeFileW(output3,DEFAULT_OUTPUT3);
+  output4 = initializeFileW(output4,DEFAULT_OUTPUT4);
 
   while(feof(input)==0){//Enquanto não encontra o fim do arquivo de entrada.
     fscanf(input,"%d ",&nItems);//Resgata o número de itens no array.
     for(i=0;i<nItems;i++){//Para cada item no array, armazena um número lido.
       fscanf(input,"%d ",&buffer[i]);//Executa a leitura do .txt de entrada.
     }
-    for(j=0;j<4;j++){//Para cada array lido do .txt, executa três variações do shell....
+
+    prtArrayCLI(buffer,nItems);
+    quickSortLomutoMedian(buffer,0,nItems-1);
+    puts("\nOrganizado:");
+    prtArrayCLI(buffer,nItems);
+
+    /*for(j=0;j<4;j++){//Para cada array lido do .txt, executa três variações do shell....
       for(k=0; k < MAX_ITEMS; k++) {//Copia o buffer para bufferClone.
         bufferClone[k] = buffer[k];
       }
-      /*switch(j){//Varia entres os tipos de shell.
+      switch(j){//Varia entres os tipos de shell.
         case 0:
           shellSortBASE2T(bufferClone, nItems, output);
           break;
@@ -125,7 +141,7 @@ int main(){//Função main. Executa os testes requisitados.
           break;
       }*/
     }
-  }
+
 
   /*fclose(output);//Fecha os ponteiros de leitura.
   fclose(input);*/
