@@ -95,7 +95,7 @@ void quickSortLomutoMedian(int array[], int firstIndex, int lastIndex){
   }
 }
 
-int qSLMPartitionRandom(int array[], int firstIndex, int lastIndex){
+int qSLPartitionRandom(int array[], int firstIndex, int lastIndex){
   int randIndex,pivot;
   int i,j;
 
@@ -130,9 +130,120 @@ int qSLMPartitionRandom(int array[], int firstIndex, int lastIndex){
 void quickSortLomutoRandom(int array[], int firstIndex, int lastIndex){
   int q;
   if(firstIndex < lastIndex){
-    q = qSLMPartitionRandom(array, firstIndex, lastIndex);
+    q = qSLPartitionRandom(array, firstIndex, lastIndex);
     quickSortLomutoRandom(array,firstIndex,q-1);
     quickSortLomutoRandom(array,q+1,lastIndex);
+  }
+}
+
+int qSHMPartition(int array[], int firstIndex, int lastIndex){
+  int mid, pivot;
+  int i,j;
+
+  mid = (firstIndex + lastIndex)/2;
+
+  //printf("Primeiro, ultimo e meio:%d %d %d\n",array[firstIndex],array[mid],array[lastIndex]);
+
+  if(array[mid] > array[lastIndex]){
+    swap(&array[mid],&array[lastIndex]);
+  }
+  if(array[lastIndex] < array[firstIndex]){
+    swap(&array[lastIndex],&array[firstIndex]);
+  }
+  if(array[mid] > array[firstIndex]){
+    swap(&array[mid],&array[lastIndex]);
+  }
+
+  pivot = array[firstIndex];
+  i = firstIndex - 1;
+  j = lastIndex;
+
+  while(1){
+    //printf("Pivot:%d %d %d\n",pivot, i, j);
+    do{
+      i++;
+    }while(array[i]<pivot);
+    do{
+      j--;
+    }while(array[j]>pivot);
+
+    /*printf("I e J:%d e %d\n",i,j);
+    prtArrayCLI(array,16);
+    printf("\n");*/
+
+
+    if(i >= j){
+      return j;
+    }
+    swap(&array[i],&array[j]);
+  }
+
+
+
+  //prtArrayCLI(array,16);
+
+  //puts("\n");
+}
+
+void quickSortHoareMedian(int array[], int firstIndex, int lastIndex){
+  int q;
+  if(firstIndex < lastIndex){
+    /*printf("Primeiro e ultimo indice:%d %d\n",firstIndex,lastIndex);
+    prtArrayCLI(array,16);
+    printf("\n");*/
+    q = qSHMPartition(array, firstIndex, lastIndex);
+    quickSortHoareMedian(array,firstIndex,q);
+    quickSortHoareMedian(array,q+1,lastIndex);
+  }
+}
+
+int qSHPartitionRandom(int array[], int firstIndex, int lastIndex){
+  int mid, pivot,randIndex;
+  int i,j;
+
+  srand(time(NULL));
+
+  randIndex = firstIndex + rand() % (lastIndex+1 - firstIndex);
+
+  swap(&array[randIndex],&array[firstIndex]);
+
+  pivot = array[firstIndex];
+  i = firstIndex - 1;
+  j = lastIndex;
+
+  while(1){
+    //printf("Pivot:%d %d %d\n",pivot, i, j);
+    do{
+      i++;
+    }while(array[i]<pivot);
+    do{
+      j--;
+    }while(array[j]>pivot);
+
+    /*printf("I e J:%d e %d\n",i,j);
+    prtArrayCLI(array,16);
+    printf("\n");*/
+
+
+    if(i >= j){
+      return j;
+    }
+    swap(&array[i],&array[j]);
+  }
+  //prtArrayCLI(array,16);
+
+  //puts("\n");
+}
+
+void quickSortHoareRandom(int array[], int firstIndex, int lastIndex){
+  int q;
+  if(firstIndex < lastIndex){
+    /*printf("Primeiro e ultimo indice:%d %d\n",firstIndex,lastIndex);
+    prtArrayCLI(array,16);
+    printf("\n");*/
+    q = qSHPartitionRandom(array, firstIndex, lastIndex);
+    quickSortHoareRandom(array,firstIndex,q);
+    quickSortHoareRandom(array,q+1,lastIndex);
   }
 }
 
@@ -169,17 +280,23 @@ int main(){//Função main. Executa os testes requisitados.
       switch(j){//Varia entres os tipos de shell.
         case 0:
           quickSortLomutoMedian(bufferClone,0,nItems-1);
-          puts("Organizado:");
+          puts("Organizado Lomuto - Mediana:");
           prtArrayCLI(bufferClone,nItems);
           break;
         case 1:
           quickSortLomutoRandom(bufferClone,0,nItems-1);
-          puts("Organizado:");
+          puts("Organizado Lomuto - Aleatório:");
           prtArrayCLI(bufferClone,nItems);
           break;
         case 2:
+          quickSortHoareMedian(bufferClone,0,nItems-1);
+          puts("Organizado Hoare - Mediana:");
+          prtArrayCLI(bufferClone,nItems);
           break;
         case 3:
+          quickSortHoareMedian(bufferClone,0,nItems-1);
+          puts("Organizado Hoare - Aleatório:");
+          prtArrayCLI(bufferClone,nItems);
           break;
       }
       printf("\n");
